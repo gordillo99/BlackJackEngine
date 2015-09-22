@@ -35,9 +35,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	dealer->dealCards(deck->getDeckCards(), player->getPlayerHand());
 
 	dealer->printDealerHandWithHiddenCard();
-
-	gameEngine->menuHandlingControl(deck->getDeckCards(), *player, *dealer, player->getMoney());
-
+	for (;;){
+		gameEngine->menuHandlingControl(deck->getDeckCards(), *player, *dealer, player->getMoney());
+	};
 	return 0;
 }
 

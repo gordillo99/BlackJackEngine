@@ -63,10 +63,12 @@ void GameEngine::menuHandlingControl(vector<Card> &deckCards, Player& player, De
 
 	bool firstHandBusted = false;
 	bool secondHandBusted = false;
+	bool dealerHandBusted;
 	int playerTotal1;
 
 	do
 	{
+		dealerHandBusted = false;
 		playerTotal1 = player.Person::calculateTotalAndPrintHand(player.getPlayerHand(), player.getPlayerHandValues(), true, "Player");
 
 		if (player.getPlayerHand().at(0).getValue() == player.getPlayerHand().at(1).getValue() && firstTurnFlag && _playerBet * 2 < money)
@@ -199,47 +201,60 @@ void GameEngine::menuHandlingControl(vector<Card> &deckCards, Player& player, De
 
 	do
 	{
-		//prints dealer's hand and calculates its value
-		dealersTotal = dealer.Person::calculateTotalAndPrintHand(dealer.getDealerHand(), dealer.getDealerHandValues(), true, "Dealer");
-
 		if (firstHandBusted)
 		{
 			cout << "Player's hand is " << playerTotal1 << ". Player has busted.\nPlayer has lost $" << _playerBet << "\n";
 			player.setMoney(money - _playerBet);
 		}
-		else if (dealersTotal > 21)
+		else
 		{
-			//indicate that dealer has busted
-			cout << "Dealer's hand has busted with a total of " << dealersTotal << "\n";
-			break;
+			//prints dealer's hand and calculates its value
+			dealersTotal = dealer.Person::calculateTotalAndPrintHand(dealer.getDealerHand(), dealer.getDealerHandValues(), true, "Dealer");
+
+			if (dealersTotal > 21)
+			{
+				//indicate that dealer has busted
+				cout << "Dealer's hand has busted with a total of " << dealersTotal << "\n";
+				dealerHandBusted = true;
+				break;
+			}
+			else if (dealersTotal > 16 && dealersTotal < 22)
+			{
+				break;
+			}
+			else if (dealersTotal < 17)
+			{
+				//dealer hits
+				hitMethod(deckCards, dealer.getDealerHand());
+				keepLoopGoing = true;
+			}
 		}
-		else if (dealersTotal > 16 && dealersTotal < 22)
-		{
-			break;
-		}
-		else if (dealersTotal < 17)
-		{
-			//dealer hits
-			hitMethod(deckCards, dealer.getDealerHand());
-			keepLoopGoing = true;
-		}
+		
 	} while (keepLoopGoing);
 
 	if (!firstHandBusted)
 	{
-		cout << "Dealer's Total: " << dealersTotal << "\nPlayers's Total: " << playerTotal1 << "\n";
-		if (dealersTotal > playerTotal1)
+		if (!dealerHandBusted)
 		{
-			cout << "Dealer has a higher hand. You have lost $" << _playerBet << ".\n";
-			player.setMoney(money - _playerBet);
+			cout << "Dealer's Total: " << dealersTotal << "\nPlayers's Total: " << playerTotal1 << "\n";
+			if (dealersTotal > playerTotal1)
+			{
+				cout << "Dealer has a higher hand. You have lost $" << _playerBet << ".\n";
+				player.setMoney(money - _playerBet);
+			}
+			else if (dealersTotal == playerTotal1)
+			{
+				cout << "Dealer and Player are tied. No money was lost/earnt.\n";
+			}
+			else if (playerTotal1 > dealersTotal)
+			{
+				cout << "Player has a higher hand. You have won $" << _playerBet << ".\n";
+				player.setMoney(money + _playerBet);
+			}
 		}
-		else if (dealersTotal == playerTotal1)
+		else
 		{
-			cout << "Dealer and Player are tied. No money was lost/earnt.\n";
-		}
-		else if (playerTotal1 > dealersTotal)
-		{
-			cout << "Player has a higher hand. You have won $" << _playerBet << ".\n";
+			cout << "You have won $" << _playerBet << ".\n";
 			player.setMoney(money + _playerBet);
 		}
 	}
