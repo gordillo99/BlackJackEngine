@@ -32,7 +32,7 @@ class GameEngine
 	public:
 		void printGameHeader();
 		void menuPrintingControl();
-		void menuHandlingControl(vector<Card> &deckCards, Player& player, vector<Card> &dealerHand, int money);
+		void menuHandlingControl(vector<Card> &deckCards, Player& player, Dealer& dealer, int money);
 
 		bool validateUserMenuInput();
 

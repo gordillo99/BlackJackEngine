@@ -46,30 +46,7 @@ void Dealer::printDealerHandWithHiddenCard()
 
 void Dealer::playAndDrawFromDeck()
 {
-	int dealersTotal = 0;
-	bool keepLoopGoing = false;
-
-	do
-	{
-		//dealersTotal = calculateTotalAndPrintHand(getDealerHand(), getDealerHandValues(), false, "Dealer"); 
-		dealersTotal = 0;
-
-		if (dealersTotal > 21)
-		{
-			//indicate that dealer has busted
-			break;
-		}
-		else if (dealersTotal > 16 && dealersTotal < 22)
-		{
-			//indicate the dealers total 
-			break;
-		}
-		else if (dealersTotal < 17)
-		{
-			//dealer hits
-			keepLoopGoing = true;
-		}
-	} while (keepLoopGoing);
+	
 }
 
 Dealer::~Dealer()

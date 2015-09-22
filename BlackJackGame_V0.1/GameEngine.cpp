@@ -53,7 +53,7 @@ void GameEngine::printGameHeader()
 	cout << "------------------------------------------------------------------------------------------------------\n";
 }
 
-void GameEngine::menuHandlingControl(vector<Card> &deckCards, Player& player, vector<Card> &dealerHand, int money)
+void GameEngine::menuHandlingControl(vector<Card> &deckCards, Player& player, Dealer& dealer, int money)
 {
 	_userDecidedToSplit = false;
 	_userDecidedToStand = false;
@@ -63,10 +63,11 @@ void GameEngine::menuHandlingControl(vector<Card> &deckCards, Player& player, ve
 
 	bool firstHandBusted = false;
 	bool secondHandBusted = false;
+	int playerTotal1;
 
 	do
 	{
-		player.Person::calculateTotalAndPrintHand(player.getPlayerHand(), player.getPlayerHandValues(), true, "Player");
+		playerTotal1 = player.Person::calculateTotalAndPrintHand(player.getPlayerHand(), player.getPlayerHandValues(), true, "Player");
 
 		if (player.getPlayerHand().at(0).getValue() == player.getPlayerHand().at(1).getValue() && firstTurnFlag && _playerBet * 2 < money)
 		{
@@ -120,6 +121,7 @@ void GameEngine::menuHandlingControl(vector<Card> &deckCards, Player& player, ve
 			if (!_userDecidedToSplit)
 			{
 				hitMethod(deckCards, player.getPlayerHand());
+				playerTotal1 = player.Person::calculateTotalAndPrintHand(player.getPlayerHand(), player.getPlayerHandValues(), false, "Player");
 			}
 			else
 			{
@@ -147,7 +149,7 @@ void GameEngine::menuHandlingControl(vector<Card> &deckCards, Player& player, ve
 			//TODO: google these rules...
 		}
 
-		if (player.Person::calculateTotalAndPrintHand(player.getPlayerHand(), player.getPlayerHandValues(), false, "Player") > 21)
+		if (playerTotal1 > 21)
 		{
 			firstHandBusted = true;
 
@@ -166,7 +168,7 @@ void GameEngine::menuHandlingControl(vector<Card> &deckCards, Player& player, ve
 
 		if (_userDecidedToSplit) //check that none of the hands have busted
 		{
-			if (player.Person::calculateTotalAndPrintHand(player.getPlayerHand2(), player.getPlayerHandValues2(), false, "Player") > 21)
+			if (playerTotal1 > 21)
 			{
 				secondHandBusted = true;
 
@@ -179,7 +181,7 @@ void GameEngine::menuHandlingControl(vector<Card> &deckCards, Player& player, ve
 
 	} while (keepMainLoopGoing);
 
-	if (player.Person::calculateTotalAndPrintHand(player.getPlayerHand(), player.getPlayerHandValues(), false, "Player") > 21)
+	if (playerTotal1 > 21)
 	{
 		firstHandBusted = true;
 	}
@@ -192,18 +194,65 @@ void GameEngine::menuHandlingControl(vector<Card> &deckCards, Player& player, ve
 		}
 	}
 
-	//TODO: ADD CODE WHERE THE DEALER GETS CARDS
+	int dealersTotal = 0;
+	bool keepLoopGoing = false;
 
+	do
+	{
+		//prints dealer's hand and calculates its value
+		dealersTotal = dealer.Person::calculateTotalAndPrintHand(dealer.getDealerHand(), dealer.getDealerHandValues(), true, "Dealer");
+
+		if (firstHandBusted)
+		{
+			cout << "Player's hand is " << playerTotal1 << ". Player has busted.\nPlayer has lost $" << _playerBet << "\n";
+			player.setMoney(money - _playerBet);
+		}
+		else if (dealersTotal > 21)
+		{
+			//indicate that dealer has busted
+			cout << "Dealer's hand has busted with a total of " << dealersTotal << "\n";
+			break;
+		}
+		else if (dealersTotal > 16 && dealersTotal < 22)
+		{
+			break;
+		}
+		else if (dealersTotal < 17)
+		{
+			//dealer hits
+			hitMethod(deckCards, dealer.getDealerHand());
+			keepLoopGoing = true;
+		}
+	} while (keepLoopGoing);
+
+	if (!firstHandBusted)
+	{
+		cout << "Dealer's Total: " << dealersTotal << "\nPlayers's Total: " << playerTotal1 << "\n";
+		if (dealersTotal > playerTotal1)
+		{
+			cout << "Dealer has a higher hand. You have lost $" << _playerBet << ".\n";
+			player.setMoney(money - _playerBet);
+		}
+		else if (dealersTotal == playerTotal1)
+		{
+			cout << "Dealer and Player are tied. No money was lost/earnt.\n";
+		}
+		else if (playerTotal1 > dealersTotal)
+		{
+			cout << "Player has a higher hand. You have won $" << _playerBet << ".\n";
+			player.setMoney(money + _playerBet);
+		}
+	}
 }
 
-void GameEngine::hitMethod(vector<Card> &deckCards, vector<Card> &playerHand) //adds one card
+void GameEngine::hitMethod(vector<Card> &deckCards, vector<Card> &playerHand) //adds one card to player's hand
 {
 	Card firstPlayerCard = deckCards.at(0);
 	deckCards.erase(deckCards.begin());
 	playerHand.push_back(firstPlayerCard);
 }
 
-void GameEngine::splitCards(vector<Card> &playerHand, vector<Card> &playerHand2)
+void GameEngine::splitCards(vector<Card> &playerHand, vector<Card> &playerHand2) //splits player's hand
 {
 	Card cardToMove = playerHand.at(0);
 	playerHand2.push_back(cardToMove);
