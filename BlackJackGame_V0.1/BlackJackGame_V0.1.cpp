@@ -25,17 +25,21 @@ int _tmain(int argc, _TCHAR* argv[])
 	unique_ptr<Deck> deck(new Deck());
 	unique_ptr<Dealer> dealer(new Dealer());
 	unique_ptr<GameEngine> gameEngine(new GameEngine());
-
+	for (;;){
 	gameEngine->printGameHeader();
 
 	player->printPlayerMoney();
 
 	gameEngine->setPlayerBet(player->betMoney());
 
+	player->emptyHand(player->getPlayerHand());
+	player->emptyHand(player->getPlayerHand2());
+	dealer->emptyHand(dealer->getDealerHand());
+
 	dealer->dealCards(deck->getDeckCards(), player->getPlayerHand());
 
 	dealer->printDealerHandWithHiddenCard();
-	for (;;){
+	
 		gameEngine->menuHandlingControl(deck->getDeckCards(), *player, *dealer, player->getMoney());
 	};
 	return 0;

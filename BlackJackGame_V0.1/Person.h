@@ -14,6 +14,7 @@ class Person
 		int _money; 
 		int getMoney(){ return _money; }
 		void setMoney(int money);
+		void emptyHand(vector<Card> &hand);
 		int calculateTotalAndPrintHand(vector<Card> &handToPrint, vector<int> &handValues, bool printHand, string name);
 		~Person();
 };

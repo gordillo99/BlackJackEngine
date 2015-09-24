@@ -2,7 +2,7 @@
 #include "Person.h"
 
 
-
+#include <algorithm> 
 #include <iostream>
 #include <string>
 #include <stdio.h>
@@ -12,6 +12,12 @@ using namespace std;
 
 Person::Person(){}
 Person::~Person(){}
+
+void Person::emptyHand(vector<Card> &hand)
+{
+	hand.clear();
+}
+
 
 int Person::calculateTotalAndPrintHand(vector<Card> &handToPrint, vector<int> &handValues, bool printHand, string name)
 {
@@ -45,11 +51,31 @@ int Person::calculateTotalAndPrintHand(vector<Card> &handToPrint, vector<int> &h
 		}
 	}
 
+	sort(begin(handValues), end(handValues));
+
 	for (vector<int>::iterator it = handValues.begin(); it != handValues.end(); ++it)
 	{
 		total += *it;
 	}
 
+	for (vector<int>::iterator it = handValues.begin(); it != handValues.end(); ++it)
+	{
+		if (total > 21)
+		{
+			if (*it == 11)
+			{
+				*it = 1;
+				total -= 10;
+			}
+		}
+		else
+		{
+			break;
+		}
+	}
+
+
+	/*
 	if (total > 21) //if the aces being 11 exceeds 21
 	{
 		bool continueChangingAceValues = false;
@@ -79,7 +105,7 @@ int Person::calculateTotalAndPrintHand(vector<Card> &handToPrint, vector<int> &h
 			}
 		} while (continueChangingAceValues);
 	}
-
+	*/
 	if (printHand)
 	{
 		cout << "\n";

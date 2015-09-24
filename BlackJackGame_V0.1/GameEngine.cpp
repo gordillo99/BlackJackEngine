@@ -49,7 +49,7 @@ void GameEngine::setPlayerBet(int bet)
 void GameEngine::printGameHeader()
 {
 	cout << "------------------------------------------------------------------------------------------------------\n";
-	cout << "                                            Starting game\n";
+	cout << "                                            Starting New Round\n";
 	cout << "------------------------------------------------------------------------------------------------------\n";
 }
 
@@ -80,7 +80,7 @@ void GameEngine::menuHandlingControl(vector<Card> &deckCards, Player& player, De
 			setSplit(false);
 		}
 
-		if (player.getPlayerHand().at(0).getValue() == 1 && firstTurnFlag)
+		if (dealer.getDealerHand.at(0).getValue() == 1 && firstTurnFlag)
 		{
 			setInsurance(true);
 		}
@@ -122,8 +122,9 @@ void GameEngine::menuHandlingControl(vector<Card> &deckCards, Player& player, De
 		{
 			if (!_userDecidedToSplit)
 			{
+				cout << "Player hits.\n"; 
 				hitMethod(deckCards, player.getPlayerHand());
-				playerTotal1 = player.Person::calculateTotalAndPrintHand(player.getPlayerHand(), player.getPlayerHandValues(), false, "Player");
+				playerTotal1 = player.Person::calculateTotalAndPrintHand(player.getPlayerHand(), player.getPlayerHandValues(), true, "Player");
 			}
 			else
 			{
@@ -132,13 +133,15 @@ void GameEngine::menuHandlingControl(vector<Card> &deckCards, Player& player, De
 		}
 		else if (_userInputForMenu.compare("s") == 0 || _userInputForMenu.compare("S") == 0)
 		{
-			keepMainLoopGoing = false;
+			cout << "Player stays.\n";
 			break;
 		}
 		else if (_userInputForMenu.compare("d") == 0 || _userInputForMenu.compare("D") == 0)
 		{
+			cout << "Player hits.\n";
 			_playerBet = _playerBet * 2;
 			hitMethod(deckCards, player.getPlayerHand());
+			playerTotal1 = player.Person::calculateTotalAndPrintHand(player.getPlayerHand(), player.getPlayerHandValues(), true, "Player");
 			break;
 		}
 		else if (_userInputForMenu.compare("p") == 0 || _userInputForMenu.compare("P") == 0)
@@ -225,6 +228,7 @@ void GameEngine::menuHandlingControl(vector<Card> &deckCards, Player& player, De
 			else if (dealersTotal < 17)
 			{
 				//dealer hits
+				cout << "Dealer hits.\n";
 				hitMethod(deckCards, dealer.getDealerHand());
 				keepLoopGoing = true;
 			}
@@ -257,6 +261,12 @@ void GameEngine::menuHandlingControl(vector<Card> &deckCards, Player& player, De
 			cout << "You have won $" << _playerBet << ".\n";
 			player.setMoney(money + _playerBet);
 		}
+	}
+
+	if (player.getMoney() <= 0)
+	{
+		cout << "\n GAME OVER\n\n You have run out of money. Insert more money to play again.\n";
+		exit(0);
 	}
 }
 
